@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chris.mapper.MenuMapper">
+    <select id="listByAdminId" resultType="com.chris.entity.Menu">
+        select
+            e.*
+        from
+            admin a
+        join
+            admin_role b
+        on
+            a.admin_id = b.admin_id
+        join
+            role_permission c
+        on
+            b.role_id = c.role_id
+        join
+            permission_menu d
+        on
+            c.permission_id = d.permission_id
+        join
+            menu e
+        on
+            d.menu_id = e.menu_id
+        where
+            a.admin_id = #{id}
+    </select>
+</mapper>

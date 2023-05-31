@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chris.mapper.CategoryMapper">
+
+    <insert id="insertOne">
+        insert into category
+            (cate_name,cate_sort,createtime,updatetime,cate_parentid)
+        values
+            (
+                #{category.cateName},
+                #{category.cateSort},
+                #{category.createtime},
+                #{category.updatetime},
+                #{category.cateParentid}
+            )
+
+    </insert>
+
+    <select id="listByCategorySearchBo" resultType="com.chris.entity.Category">
+        select * from category
+        <where>
+            <if test="categorySearchBo.cateId != null">
+                cate_id = #{categorySearchBo.cateId}
+            </if>
+            <if test="categorySearchBo.cateName != null and categorySearchBo.cateName.length >0">
+                and cate_name like '%${categorySearchBo.cateName}%'
+            </if>
+            <if test="categorySearchBo.cateParentid != null and categorySearchBo.cateParentid != -1">
+                and cate_parentid = #{categorySearchBo.cateParentid}
+            </if>
+        </where>
+        limit
+            #{pageBo.startIndex},#{pageBo.pageSize}
+    </select>
+
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(*) from category
+        <where>
+            <if test="categorySearchBo.cateId != null">
+                cate_id = #{categorySearchBo.cateId}
+            </if>
+            <if test="categorySearchBo.cateName != null and categorySearchBo.cateName.length >0">
+                and cate_name like '%${categorySearchBo.cateName}%'
+            </if>
+            <if test="categorySearchBo.cateParentid != null and categorySearchBo.cateParentid != -1">
+                and cate_parentid = #{categorySearchBo.cateParentid}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByCateName" resultType="com.chris.entity.Category">
+        select * from category where cate_name = #{cateName}
+    </select>
+
+
+</mapper>

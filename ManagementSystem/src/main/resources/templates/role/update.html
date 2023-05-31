@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑角色</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="container-fluid">
+    <form th:action="@{/role/alter}" method="post">
+
+        <div class="my-2">
+            <!--输入框组-->
+            <div class="input-group">
+                <!--文前缀-->
+                <div class="input-group-prepend">
+                    <div class="input-group-text">角色编号</div>
+                </div>
+                <input type="text" class="form-control" name="roleId" readonly th:value="${role.roleId}">
+            </div>
+        </div>
+
+        <div class="my-2">
+            <!--输入框组-->
+            <div class="input-group">
+                <!--文前缀-->
+                <div class="input-group-prepend">
+                    <div class="input-group-text">角色名称</div>
+                </div>
+                <input type="text" class="form-control" name="roleName" placeholder="北凉徐凤年" th:value="${role.roleName}">
+            </div>
+        </div>
+
+        <div class="my-2 info">
+
+        </div>
+
+        <div class="my-2 row">
+
+            <div class="my-2 col-6" th:each="big : ${permissionList}"
+                 th:if="${big.pid == null}">
+
+                <div class="card">
+                    <!--一级权限-->
+                    <div class="card-header" >
+                        <input type="checkbox" name="permissionIdList" th:value="${big.permissionId}" class="big"
+                               th:checked="${big.roleId != null}">
+                        <span th:text="${big.permissionName}"></span>
+                    </div>
+
+                    <div class="card-body" th:each="mid : ${permissionList}"
+                         th:if="${mid.pid} == ${big.permissionId}">
+                        <!--二级权限-->
+                        <div class="my-2 pl-2 " >
+                            <input type="checkbox" name="permissionIdList" th:value="${mid.permissionId}" class="mid"
+                                   th:checked="${mid.roleId != null}">
+                            <span th:text="${mid.permissionName}"></span>
+                            <!--三级权限-->
+                            <div class="my-2 pl-2 d-flex">
+                                <div class="mx-2" th:each="small : ${permissionList}"
+                                     th:if="${small.pid} == ${mid.permissionId}">
+                                    <input type="checkbox" name="permissionIdList" th:value="${small.permissionId}" class="small"
+                                           th:checked="${mid.roleId != null}">
+                                    <span th:text="${small.permissionName}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <button  class="btn btn-primary">保存</button>
+
+
+    </form>
+
+    <div style="height: 100px"></div>
+</div>
+
+<script>
+
+
+
+    // 一级权限的change事件
+    $(".big").change(function(){
+        // 判断当前一级权限是否取消勾选
+        if( $(this).prop("checked") == false ){
+            // 将当前一级权限下的所有二级三级权限全部取消勾选
+            $(this).parents(".card").find(".mid,.small").prop("checked",false)
+        }else{
+            // 如果当前一级权限选中，将当前一级权限下的所有二级三级权限全部勾选
+            $(this).parents(".card").find(".mid,.small").prop("checked",true)
+        }
+    })
+
+    // 二级权限change事件
+    $(".mid").change(function(){
+
+        // 判断当前二级权限的状态，如果是false，则当前二级权限下的所有三级权限全部取消勾选
+        if( $(this).prop("checked") == false ){
+            $(this).parents(".card-body").find(".small").prop("checked",false)
+        }
+
+        // 定义一个变量，决定一级权限是否勾选
+        let flag = false
+        // 循环判断二级权限的状态
+        $(this).parents(".card").find(".mid").each(function(){
+            // 判断当前遍历到的二级权限是否选中
+            if($(this).prop("checked") == true ){
+                // 只要有一个二级权限选中，则一级权限必须选中
+                $(this).parents(".card").find(".big").prop("checked",true)
+                flag = true
+            }
+        })
+
+        // 循环过后判断这个标记变量是否被改变了，如果还是false，则一级权限不要选中
+        if( flag == false){
+            $(this).parents(".card").find(".big").prop("checked",false)
+        }
+    })
+
+
+    // 三级权限勾选，则二级一级必须勾选
+    $(".small").change(function(){
+        // 判断当前三级权限是否选中
+        if( $(this).prop("checked") ){
+            // 选中当前三级权限所属的二级权限
+            $(this).parents(".card-body").find(".mid").prop("checked",true)
+            // 选中当前三级权限所属的一级权限
+            $(this).parents(".card").find(".big").prop("checked",true)
+        }
+    })
+
+
+
+
+    // 角色名称校验
+    $("input[name='roleName']").change(function(){
+        // 发送ajax请求
+        $.ajax({
+            url : "/role/validName",
+            type :　"GET",
+            data: {roleName :$(this).val() },
+            success : function(data){
+
+                if(data == "true"){
+                    $(".info").html("<font color='red'>该角色已经存在</font>")
+                }else{
+                    $(".info").html("<font color='green'>可用的角色名</font>")
+                }
+
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工管理</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <script th:src="@{/js/global.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+<form class="mt-2" th:action="@{/admin/admin}" name="form1">
+    <div class="container-fluid ">
+        <div class="row">
+            <div class="col-4">
+                <!--准备一个输入框组-->
+                <div class="input-group">
+                    <!--文本前缀-->
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">员工编号</div>
+                    </div>
+                    <input type="text" class="form-control" name="adminId" placeholder="王仙芝" th:value="${searchBo.adminId}">
+                </div>
+            </div>
+            <div class="col-4">
+                <!--准备一个输入框组-->
+                <div class="input-group">
+                    <!--文本前缀-->
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">账户名称</div>
+                    </div>
+                    <input type="text" class="form-control" name="adminName" placeholder="李淳罡" th:value="${searchBo.adminName}">
+                </div>
+            </div>
+            <div class="col-4">
+                <!--准备一个输入框组-->
+                <div class="input-group">
+                    <!--文本前缀-->
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">员工姓名</div>
+                    </div>
+                    <input type="text" class="form-control" name="adminNickname" placeholder="徐凤年" th:value="${searchBo.adminNickname}">
+                </div>
+            </div>
+            <div class="col-4 mt-3">
+                <!--准备一个输入框组-->
+                <div class="input-group">
+                    <!--文本前缀-->
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">员工角色</div>
+                    </div>
+                    <!--角色不应该用户手动输入，而是有一个下拉列表，所有角色都可以供用户选择-->
+                    <select name="roleId" class="form-control">
+                        <!--放入一个占位选项，提示用户选择角色-->
+                        <option value="-1">查询所有角色</option>
+                        <option th:each="role : ${roleList}"
+                                th:value="${role.roleId}"
+                                th:text="${role.roleName}"
+                                th:selected="${role.roleId} == ${searchBo.roleId}">角色名称</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-4 mt-3">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">查询</button>
+                    <a th:href="@{/admin/add}" class="btn btn-success">添加员工</a>
+                    <button type="button" class="btn btn-danger batch-del">批量删除</button>
+                </div>
+            </div>
+            <!--分页相关参数-->
+            <div class="col-4 mt-3">
+                <div class="btn-group">
+                    <input type="text" hidden name="page" th:value="${pageBo.page}">
+                    <input type="text" hidden name="pageSize" th:value="${pageBo.pageSize}">
+                    <input type="text" hidden name="pageCount" th:value="${pageBo.pageCount}">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!--/筛选面板-->
+
+<!--数据展示-->
+
+<form th:action="@{/admin/delete}" method="post" name="form2">
+    <div class="container-fluid my-4">
+        <table class="table table-striped table-bordered table-sm cbx-group">
+            <thead>
+            <tr>
+                <!--复选框-->
+                <th><input type="checkbox" class="cbx-all"></th>
+                <th>员工编号</th>
+                <th>员工名称</th>
+                <th>员工姓名</th>
+                <th>员工角色</th>
+                <th>操作选项</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="admin:${adminList}">
+                <!--先准备name和value方便做全选和反选-->
+                <td><input type="checkbox" name="idList" th:value="${admin.adminId}" class="cbx-one"></td>
+                <td th:text="${admin.adminId}">员工编号</td>
+                <td th:text="${admin.adminName}">员工名称</td>
+                <td th:text="${admin.adminNickname}">员工姓名</td>
+                <td>
+                    <span th:each="role : ${admin.roleList}" th:text="${role.roleName}" class="mx-2"></span>
+                </td>
+                <td>
+                    <!--放一个按钮组-->
+                    <div class="btn-group btn-group-sm">
+                        <a th:href="@{'/admin/update?adminId='+${admin.adminId}} " class="btn btn-warning">编辑</a>
+                        <a th:href="@{'/admin/delete?adminId='+${admin.adminId}}" class="btn btn-danger btn-del">删除</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</form>
+<!--/数据展示-->
+
+<!--分页控件-->
+<div class="container-fluid">
+<!--    开启栅格布局-->
+    <div class="row">
+
+        <!-- 上下翻页控件-->
+        <div class="col-6">
+            <div class="btn-group">
+                <button class="btn btn-primary btn-first" th:disabled="${pageBo.page} == 1">首页</button>
+                <button class="btn btn-primary btn-prev" th:disabled="${pageBo.page} == 1">上一页</button>
+                <button class="btn btn-primary btn-next" th:disabled="${pageBo.page} == ${pageBo.pageCount}">下一页</button>
+                <button class="btn btn-primary btn-last" th:disabled="${pageBo.page} == ${pageBo.pageCount}">尾页</button>
+            </div>
+        </div>
+
+        <!-- /上下翻页控件-->
+
+
+        <!-- 页面跳转控件-->
+        <div class="col-3">
+            <div class="input-group">
+                <input type="text" class="form-control input-page-jump" th:value="${pageBo.page}" dir="rtl">
+        <!-- 再拼上页面总计-->
+                <div class="input-group-append">
+                    <div class="input-group-text">/<span th:text="${pageBo.pageCount}">页</span></div>
+                </div>
+        <!-- 再拼上跳转按钮-->
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-jump">GO</button>
+                </div>
+            </div>
+        </div>
+        <!-- /页面跳转控件-->
+        <div class="col-3">
+            <select class="form-control select-page-size" >
+        <!-- 需要做持久化，否则刷选条件会重新跳转回默认-->
+                <option value="10" th:selected="${pageBo.pageSize} == 10">每页显示10条记录</option>
+                <option value="20" th:selected="${pageBo.pageSize} == 20">每页显示20条记录</option>
+                <option value="30" th:selected="${pageBo.pageSize} == 30">每页显示30条记录</option>
+                <option value="40" th:selected="${pageBo.pageSize} == 40">每页显示40条记录</option>
+                <option value="50" th:selected="${pageBo.pageSize} == 50">每页显示50条记录</option>
+            </select>
+        </div>
+    </div>
+</div>
+<!--/分页控件-->
+
+<div style="height: 100px"></div>
+
+<script>
+
+
+
+    //为翻页控件添加点击事件
+
+    // 给首页添加点击事件
+    $(".btn-first").click(function(){
+        // 将当前页码变成1，提交表单
+        $("input[name='page']").val( 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给上一页添加点击事件
+    $(".btn-prev").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( $("input[name='page']").val() - 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给下一页添加点击事件
+    $(".btn-next").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( parseInt($("input[name='page']").val()) + 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+
+    // 给末页添加点击事件
+    $(".btn-last").click(function(){
+        // 将当前页码变成最大页数，提交表单
+        $("input[name='page']").val( $("input[name='pageCount']").val() )
+        // 提交表单
+        form1.submit()
+    })
+
+    //页面跳转控件
+    $(".btn-jump").click(function (){
+        //不理解
+        // $(".input-page-jump").val($("input[name='page']").val())
+        // form1.submit()
+        $("input[name='page']").val( $(".input-page-jump").val() )
+        form1.submit()
+    })
+
+
+
+    $(".select-page-size").change(function (){
+        $("input[name='pageSize']").val($(this).val())
+        form1.submit()
+
+    })
+
+    //为批量删除添加点击事件
+    $(".batch-del").click(function (){
+        // 判断是否至少选择了一个用户
+        if($("input[name = 'idList']:checked").length == 0){
+            alert("请至少选择一个用户进行删除")
+        }else{
+            // 防止用户误操作
+            if(confirm("确定要删除吗?") == false){
+                return;
+            }
+            // 提交表单2
+            form2.submit()
+        }
+    })
+
+    //为单个删除按钮添加点击事件，做预防用户误删功能
+    $(".btn-del").click(function (){
+        //点击删除后弹窗提醒用户是否确认操作
+        if(confirm("确定要删除吗?") == false){
+            // 阻止超链接的默认事件
+            event.preventDefault()
+        }
+    })
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑员工信息</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <script th:src="@{/js/global.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+<form th:action="@{/admin/alter}" method="post">
+    <div class="container-fluid">
+
+        <div class="input-group my-2">
+            <div class="input-group-append">
+                <div class="input-group-text">员工编号</div>
+            </div>
+            <input type="text" name="adminId" class="form-control" th:value="${admin.adminId}">
+        </div>
+
+        <div class="input-group my-2">
+            <div class="input-group-append">
+                <div class="input-group-text">账户名称</div>
+            </div>
+            <input type="text" name="adminName" class="form-control" th:value="${admin.adminName}">
+        </div>
+
+        <div class="input-group my-2">
+            <div class="input-group-append">
+                <div class="input-group-text">用户姓名</div>
+            </div>
+            <input type="text" name="adminNickname" class="form-control" th:value="${admin.adminNickname}">
+        </div>
+
+        <!-- 修改角色列表   -->
+        <div class="my-2">
+            <button type="button" class="btn btn-success role-add">+添加角色</button>
+        </div>
+
+        <!--   修改角色的下拉列表   -->
+        <div class="my-2 row role-group">
+            <div class="col-3 d-flex role my-2" th:each="adminRole:${admin.roleList}">
+                <!--在添加角色时，应该是放到一个角色列表中-->
+                <select name="roleList[0].roleId" class="form-control select-role">
+                    <option th:each="role:${roleList}"
+                            th:value="${role.roleId}"
+                            th:text="${role.roleName}"
+                            th:selected="${role.roleId} == ${adminRole.roleId}">角色名称</option>
+                </select>
+                <button type="button" class="btn btn-danger btn-del">-</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">确认操作</button>
+</form>
+
+<script>
+    // 给-绑定点击事件
+    $(".btn-del").click(function(){
+        // 只有存在两个及以上角色才能删除
+        if( $(".role").length > 1 ){
+            $(this).parents(".role").remove()
+        }
+        resetIndex()
+    })
+
+    // 给添加员工按钮加上点击事件
+    $(".role-add").click(function(){
+        // 克隆一份角色，添加到角色组中
+        let clone = $(".role").last().clone(true)
+        // 将克隆的角色下拉列表添加到角色组中
+        clone.appendTo(".role-group")
+        resetIndex()
+    })
+
+
+    // 给角色列表重新排列索引
+    function resetIndex (){
+        // 循环每一个角色
+        $(".role").each(function(index,item){
+            $(this).find(".select-role").prop("name","roleList["+index+"].roleId")
+        })
+    }
+</script>
+
+</body>
+</html>

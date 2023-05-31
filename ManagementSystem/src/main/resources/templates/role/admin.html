@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>角色管理</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <script th:src="@{/js/global.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<form th:action="@{/role/admin}" method="post" name="form1">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-4 my-2" >
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <div class="input-group-text">角色编号</div>
+                        <input type="text" name="roleId" th:value="${searchRole.roleId} " placeholder="李淳罡">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 my-2" >
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <div class="input-group-text">角色名称</div>
+                        <input type="text" name="roleName" th:value="${searchRole.roleName} " placeholder="徐凤年">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 my-2">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">查询</button>
+                    <a th:href="@{/role/add}"  class="btn btn-success">添加角色</a>
+                    <button type="button" class="btn btn-danger batch-del">批量删除</button>
+                </div>
+            </div>
+
+            <!--分页相关参数-->
+            <div class="col-4 mt-3">
+                <div class="btn-group">
+                    <input type="text" hidden name="page" th:value="${pageBo.page}">
+                    <input type="text" hidden name="pageSize" th:value="${pageBo.pageSize}">
+                    <input type="text" hidden name="pageCount" th:value="${pageBo.pageCount}">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!--数据展示-->
+<div class="container-fluid my-2">
+    <form th:action="@{/role/delete}" method="post" name="form2">
+        <table class="table table-striped table-bordered table-sm cbx-group">
+            <thead>
+            <tr>
+                <!--复选框-->
+                <th><input type="checkbox" class="cbx-all"></th>
+                <th>角色编号</th>
+                <th>角色名称</th>
+                <th>操作选项</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="role:${roleList}">
+                <td><input type="checkbox" name="idList"  th:value="${role.roleId}" class="cbx-one"></td>
+                <td th:text="${role.roleId}">角色编号</td>
+                <td th:text="${role.roleName}">角色名称</td>
+                <td class="btn-group btn-group-sm">
+                    <a th:href="@{'/role/update?roleId='+${role.roleId}}" class="btn btn-warning">编辑</a>
+                    <a th:href="@{'/role/delete?roleId='+${role.roleId}}" class="btn btn-danger">删除</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<!--/数据展示-->
+
+<!--分页控件-->
+
+<div class="container-fluid">
+    <!--开启栅格布局-->
+    <div class="row">
+        <div class="col-6">
+
+            <div class="btn-group">
+                <button class="btn btn-primary btn-first" th:disabled="${pageBo.page} == 1">首页</button>
+                <button class="btn btn-primary btn-prev" th:disabled="${pageBo.page} == 1">上一页</button>
+                <button class="btn btn-primary btn-next" th:disabled="${pageBo.page} == ${pageBo.pageCount}">下一页</button>
+                <button class="btn btn-primary btn-last" th:disabled="${pageBo.page} == ${pageBo.pageCount}">末页</button>
+            </div>
+
+        </div>
+        <div class="col-3">
+            <div class="input-group">
+                <input type="text" class="form-control  input-page-jump" th:value="${pageBo.page}" dir="rtl">
+                <!--后缀-->
+                <div class="input-group-append">
+                    <div class="input-group-text">/<span th:text="${pageBo.pageCount}"></span>页</div>
+                </div>
+                <!--跳转按钮-->
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-jump">Go</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <select class="form-control select-page-size">
+                <option value="10" th:selected="${pageBo.pageSize} == 10">每页显示10条记录</option>
+                <option value="20" th:selected="${pageBo.pageSize} == 20">每页显示20条记录</option>
+                <option value="30" th:selected="${pageBo.pageSize} == 30">每页显示30条记录</option>
+                <option value="40" th:selected="${pageBo.pageSize} == 40">每页显示40条记录</option>
+                <option value="50" th:selected="${pageBo.pageSize} == 50">每页显示50条记录</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<div style="height: 100px"></div>
+<!--/分页控件-->
+
+
+<script>
+
+
+    // 批量删除按钮点击事件
+    $(".batch-del").click(function(){
+
+        // 判断是否至少选择了一个用户
+        if($("input[name = 'idList']:checked").length == 0){
+            alert("请至少选择一个用户进行删除")
+        }else{
+            // 防止用户误操作
+            if(confirm("确定要删除吗?") == false){
+                return;
+            }
+
+            // 提交表单2
+            form2.submit()
+        }
+    })
+
+    // 给上一页添加点击事件
+    $(".btn-prev").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( $("input[name='page']").val() - 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给下一页添加点击事件
+    $(".btn-next").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( parseInt($("input[name='page']").val()) + 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+
+    // 给首页添加点击事件
+    $(".btn-first").click(function(){
+        // 将当前页码变成1，提交表单
+        $("input[name='page']").val( 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给末页添加点击事件
+    $(".btn-last").click(function(){
+        // 将当前页码变成最大页数，提交表单
+        $("input[name='page']").val( $("input[name='pageCount']").val() )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 跳转按钮点击事件
+    $(".btn-jump").click(function(){
+        $("input[name='page']").val( $(".input-page-jump").val() )
+        form1.submit()
+    })
+
+    $(".select-page-size").change(function(){
+
+        $("input[name='pageSize']").val( $(this).val() )
+
+        form1.submit()
+    })
+</script>
+
+</body>
+</html>

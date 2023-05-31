@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>北凉徐凤年</title>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/global.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<!--筛选面板-->
+
+<form class="my-2"  th:action="@{/user/admin}" name="form1">
+    <div class="container-fluid">
+        <div class="row">
+            <!--  四个查询条件：客户编号、客户昵称、手机号、邮箱  -->
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">客户编号</div>
+                    </div>
+                    <input type="text" placeholder="请输入客户编号" name="userId" th:value="${userSearchBo.userId}">
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">客户昵称</div>
+                    </div>
+                    <input type="text" placeholder="王仙芝" name="userName" th:value="${userSearchBo.userName}">
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">客户手机号</div>
+                    </div>
+                    <input type="text" placeholder="李淳罡" name="userPhone" th:value="${userSearchBo.userPhone}">
+                </div>
+            </div>
+
+            <div class="col-4 my-2">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">客户邮箱</div>
+                    </div>
+                    <input type="text" placeholder="徐凤年" name="userEmail" th:value="${userSearchBo.userEmail}">
+                </div>
+            </div>
+
+            <!-- 查询按钮 -->
+            <div class="col-4 mt-3">
+                <button type="submit" class="btn btn-primary">确定</button>
+            </div>
+
+            <!-- 分页参数 -->
+            <div class="col-4 mt-3">
+                <div class="input-group">
+                     <input type="text" hidden name="page" th:value="${pageBo.page}" >
+                     <input type="text" hidden name="pageSize" th:value="${pageBo.pageSize}" >
+                     <input type="text" hidden name="pageCount" th:value="${pageBo.pageCount}" >
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<!--/筛选面板-->
+
+
+<!--数据展示页面-->
+
+<form class="my-2" method="post">
+
+    <div class="container-fluid my-2">
+        <table class="table table-striped table-sm table-bordered cbx-group">
+
+            <thead>
+            <tr>
+                <!--复选框-->
+                <th><input type="checkbox" class="cbx-all"> </th>
+                <th>客户编号</th>
+                <th>客户名称</th>
+                <th>客户手机号</th>
+                <th>客户邮箱</th>
+                <th>客户状态</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="user:${userList}">
+                <td><input type="checkbox" name="idList"  class="cbx-one" th:value="${user.userId}"></td>
+                <th th:text="${user.userId}">客户编号</th>
+                <th th:text="${user.userName}">客户名称</th>
+                <th th:text="${user.userPhone}">客户手机号</th>
+                <th th:text="${user.userEmail}">客户邮箱</th>
+                <th th:if="${user.userStatus} == 0">健在</th>
+                <th th:if="${user.userStatus} == 1">挂了</th>
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</form>
+
+<!--/数据展示页面-->
+
+
+<!--分页控件-->
+
+<div class="container-fluid">
+    <!--开启栅格布局-->
+    <div class="row">
+        <div class="col-6">
+
+            <div class="btn-group">
+                <button class="btn btn-primary btn-first" th:disabled="${pageBo.page} == 1">首页</button>
+                <button class="btn btn-primary btn-prev" th:disabled="${pageBo.page} == 1">上一页</button>
+                <button class="btn btn-primary btn-next" th:disabled="${pageBo.page} == ${pageBo.pageCount}">下一页</button>
+                <button class="btn btn-primary btn-last" th:disabled="${pageBo.page} == ${pageBo.pageCount}">末页</button>
+            </div>
+
+        </div>
+        <div class="col-3">
+            <div class="input-group">
+                <input type="text" class="form-control  input-page-jump" th:value="${pageBo.page}" dir="rtl">
+                <!--后缀-->
+                <div class="input-group-append">
+                    <div class="input-group-text">/<span th:text="${pageBo.pageCount}"></span>页</div>
+                </div>
+                <!--跳转按钮-->
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-jump">Go</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <select class="form-control select-page-size">
+                <option value="10" th:selected="${pageBo.pageSize} == 10">每页显示10条记录</option>
+                <option value="20" th:selected="${pageBo.pageSize} == 20">每页显示20条记录</option>
+                <option value="30" th:selected="${pageBo.pageSize} == 30">每页显示30条记录</option>
+                <option value="40" th:selected="${pageBo.pageSize} == 40">每页显示40条记录</option>
+                <option value="50" th:selected="${pageBo.pageSize} == 50">每页显示50条记录</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!--/分页控件-->
+
+<div style="height: 100px"></div>
+
+<script>
+
+    // 给上一页添加点击事件
+    $(".btn-prev").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( $("input[name='page']").val() - 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给下一页添加点击事件
+    $(".btn-next").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( parseInt($("input[name='page']").val()) + 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+
+    // 给首页添加点击事件
+    $(".btn-first").click(function(){
+        // 将当前页码变成1，提交表单
+        $("input[name='page']").val( 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给末页添加点击事件
+    $(".btn-last").click(function(){
+        // 将当前页码变成最大页数，提交表单
+        $("input[name='page']").val( $("input[name='pageCount']").val() )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 跳转按钮点击事件
+    $(".btn-jump").click(function(){
+        $("input[name='page']").val( $(".input-page-jump").val() )
+        form1.submit()
+    })
+
+    $(".select-page-size").change(function(){
+
+        $("input[name='pageSize']").val( $(this).val() )
+
+        form1.submit()
+    })
+
+
+</script>
+
+</body>
+</html>

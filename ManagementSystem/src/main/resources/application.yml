@@ -1,0 +1,21 @@
+server:
+  port: 8005
+spring:
+  thymeleaf:
+    cache: false    # 关闭缓存
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/atstudy
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  configuration:
+    # 是否开启驼峰映射，默认是true
+    map-underscore-to-camel-case: true
+    # 开启查询日志
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

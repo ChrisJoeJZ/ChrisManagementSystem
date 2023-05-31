@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chris.mapper.AdminMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="adminAddBo.adminId">
+        insert into admin
+            (admin_id,admin_name,admin_pass,admin_nickname)
+        values
+            (#{adminAddBo.adminId},#{adminAddBo.adminName},#{adminAddBo.adminPass},#{adminAddBo.adminNickname})
+    </insert>
+    <insert id="batchInsertAdminRole">
+        insert into admin_role
+        (admin_id,role_id)
+        values
+        <foreach collection="adminAddBo.roleList" item="role" separator=",">
+            (#{adminAddBo.adminId},${role.roleId})
+        </foreach>
+    </insert>
+    <update id="updateByAdminUpdateBo">
+        update
+            admin
+        set
+            admin_name = #{adminUpdateBo.adminName},admin_nickname=#{adminUpdateBo.adminNickname}
+        where
+            admin_id = #{adminUpdateBo.adminId}
+    </update>
+
+    <delete id="batchDeleteRoleByAdminId">
+        delete from admin_role where admin_id = #{adminUpdateBo.adminId}
+    </delete>
+
+    <select id="getAdminById" resultMap="admin">
+        select * from admin where admin_id = #{id}
+    </select>
+
+
+    <select id="getAdminByName" resultMap="admin">
+        select * from admin where admin_name = #{name}
+    </select>
+
+    <select id="getCount" resultType="java.lang.Long">
+        select
+        count(distinct a.admin_id)
+        from
+        admin a
+        left join
+        admin_role b
+        on
+        a.admin_id = b.admin_id
+        <where>
+            <if test="adminSearchBo.adminId != null">
+                a.admin_id = #{adminSearchBo.adminId}
+            </if>
+            <if test="adminSearchBo.adminName != null and adminSearchBo.adminName.length > 0">
+                and a.admin_name = #{adminSearchBo.adminName}
+            </if>
+            <if test="adminSearchBo.adminNickname != null and adminSearchBo.adminNickname.length > 0">
+                and a.admin_nickname = #{adminSearchBo.adminNickname}
+            </if>
+            <if test="adminSearchBo.roleId != null and adminSearchBo.roleId != -1">
+                and b.role_id = #{adminSearchBo.roleId}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="listByAdminSearchBo" resultMap="admin">
+        select
+        distinct a.*
+        from
+        admin a
+        left join
+        admin_role b
+        on
+        a.admin_id = b.admin_id
+        <where>
+            <if test="adminSearchBo.adminId != null">
+                a.admin_id = #{adminSearchBo.adminId}
+            </if>
+            <if test="adminSearchBo.adminName != null and adminSearchBo.adminName.length > 0">
+                and a.admin_name = #{adminSearchBo.adminName}
+            </if>
+            <if test="adminSearchBo.adminNickname != null and adminSearchBo.adminNickname.length > 0">
+                and a.admin_nickname = #{adminSearchBo.adminNickname}
+            </if>
+            <if test="adminSearchBo.roleId != null and adminSearchBo.roleId != -1">
+                and b.role_id = #{adminSearchBo.roleId}
+            </if>
+        </where>
+
+
+        order by a.admin_id
+        limit
+        #{pageBo.startIndex},#{pageBo.pageSize}
+    </select>
+
+
+    <resultMap id="admin" type="com.chris.entity.Admin" >
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="admin_pass" property="adminPass"/>
+        <result column="admin_nickname" property="adminNickname"/>
+
+        <collection property="roleList" column="admin_id"
+                    ofType="com.chris.entity.Role"
+                    select="com.chris.mapper.RoleMapper.getRoleListByAdminId"/>
+
+        <collection property="menuList" column="admin_id"
+                    ofType="com.chris.entity.Menu"
+                    select="com.chris.mapper.MenuMapper.listByAdminId"/>
+    </resultMap>
+</mapper>

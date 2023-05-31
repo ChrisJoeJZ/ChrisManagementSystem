@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分类管理</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<!--筛选面板-->
+
+<form th:action="@{/category/admin}" class="my-2" name="form1" method="post">
+    <div class="container-fluid">
+        <div class="row">
+
+            <!--准备输入框组，放置筛选条件-->
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">分类编号</div>
+                    </div>
+                    <input type="text" name="cateId" class="form-control" placeholder="王仙芝" th:value="${categorySearchBo.cateId}">
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">分类名称</div>
+                    </div>
+                    <input type="text" name="cateName" class="form-control" placeholder="李淳罡" th:value="${categorySearchBo.cateName}">
+                </div>
+            </div>
+
+            <!--准备一个下拉列表，供用户选择分类的父级名称（遍历整个父级list）-->
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">分类名称</div>
+                    </div>
+                    <!--下拉列表部分-->
+                    <select name="cateParentid" class="form-control">
+                        <option value="-1">呼风唤雨驱雷策电</option>
+                        <option th:each="cate : ${categoryAll}"
+                                th:value="${cate.cateId}"
+                                th:text="${cate.cateName}"
+                                th:selected="${cate.cateId} == ${categorySearchBo.cateParentid}">父级分类名称</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-4 mt-3">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">查询</button>
+                    <a th:href="@{/category/add}" class="btn btn-success">添加分类</a>
+                </div>
+            </div>
+            <!--分页相关参数-->
+            <div class="col-4 mt-3">
+                <div class="btn-group">
+                    <input type="text" hidden name="page" th:value="${pageBo.page}">
+                    <input type="text" hidden name="pageSize" th:value="${pageBo.pageSize}">
+                    <input type="text" hidden name="pageCount" th:value="${pageBo.pageCount}">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<!--/筛选面板-->
+
+<!--数据展示页面-->
+
+<div class="container-fluid my-4">
+    <table class="table table-bordered table-striped table-sm cbx-group">
+        <thead>
+        <tr>
+            <th>分类编号</th>
+            <th>分类名称</th>
+            <th>分类排序</th>
+            <th>父级分类</th>
+            <th>创建时间</th>
+            <th>更新时间</th>
+            <th>操作选项</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="cate: ${categoryList}">
+            <td th:text="${cate.cateId}">员工编号</td>
+            <td th:text="${cate.cateName}">员工名称</td>
+            <td th:text="${cate.cateSort}">分类排序</td>
+            <td th:text="${cate.cateParentid}">父级分类编号</td>
+            <td th:text="${#temporals.format(cate.createtime,'yyyy-MM-dd')}">创建时间</td>
+            <td th:text="${#temporals.format(cate.updatetime,'yyyy-MM-dd')}">更新时间</td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <a th:href="@{'/category/update?cateId='+${cate.cateId}}" class="btn btn-warning">编辑</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--/数据展示页面-->
+
+<!--分页控件-->
+
+<div class="container-fluid">
+    <!--开启栅格布局-->
+    <div class="row">
+        <div class="col-6">
+
+            <div class="btn-group">
+                <button class="btn btn-primary btn-first" th:disabled="${pageBo.page} == 1">首页</button>
+                <button class="btn btn-primary btn-prev" th:disabled="${pageBo.page} == 1">上一页</button>
+                <button class="btn btn-primary btn-next" th:disabled="${pageBo.page} == ${pageBo.pageCount}">下一页</button>
+                <button class="btn btn-primary btn-last" th:disabled="${pageBo.page} == ${pageBo.pageCount}">末页</button>
+            </div>
+
+        </div>
+        <div class="col-3">
+            <div class="input-group">
+                <input type="text" class="form-control  input-page-jump" th:value="${pageBo.page}" dir="rtl">
+                <!--后缀-->
+                <div class="input-group-append">
+                    <div class="input-group-text">/<span th:text="${pageBo.pageCount}"></span>页</div>
+                </div>
+                <!--跳转按钮-->
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-jump">Go</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <select class="form-control select-page-size">
+                <option value="10" th:selected="${pageBo.pageSize} == 10">每页显示10条记录</option>
+                <option value="20" th:selected="${pageBo.pageSize} == 20">每页显示20条记录</option>
+                <option value="30" th:selected="${pageBo.pageSize} == 30">每页显示30条记录</option>
+                <option value="40" th:selected="${pageBo.pageSize} == 40">每页显示40条记录</option>
+                <option value="50" th:selected="${pageBo.pageSize} == 50">每页显示50条记录</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!--/分页控件-->
+
+<div style="height: 100px"></div>
+
+
+<script>
+
+
+
+    // 给上一页添加点击事件
+    $(".btn-prev").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( $("input[name='page']").val() - 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给下一页添加点击事件
+    $(".btn-next").click(function(){
+        // 将当前页码减1，提交表单
+        $("input[name='page']").val( parseInt($("input[name='page']").val()) + 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+
+    // 给首页添加点击事件
+    $(".btn-first").click(function(){
+        // 将当前页码变成1，提交表单
+        $("input[name='page']").val( 1 )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 给末页添加点击事件
+    $(".btn-last").click(function(){
+        // 将当前页码变成最大页数，提交表单
+        $("input[name='page']").val( $("input[name='pageCount']").val() )
+        // 提交表单
+        form1.submit()
+    })
+
+    // 跳转按钮点击事件
+    $(".btn-jump").click(function(){
+        $("input[name='page']").val( $(".input-page-jump").val() )
+        form1.submit()
+    })
+
+    $(".select-page-size").change(function(){
+
+        $("input[name='pageSize']").val( $(this).val() )
+
+        form1.submit()
+    })
+</script>
+
+</body>
+</html>

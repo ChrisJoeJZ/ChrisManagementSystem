@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加员工</title>
+   <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+   <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+   <script th:src="@{/js/global.js}"></script>
+   <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+
+
+
+<div class="container-fluid">
+  <form action="/admin/save" method="post">
+
+    <div class="input-group my-2">
+      <div class="input-group-append">
+        <div class="input-group-text">账户名称</div>
+      </div>
+      <input type="text" name="adminName" class="form-control" placeholder="徐凤年">
+    </div>
+
+    <div class="input-group my-2">
+      <div class="input-group-append">
+        <div class="input-group-text">用户姓名</div>
+      </div>
+      <input type="text" name="adminNickname" class="form-control" placeholder="李淳罡">
+    </div>
+
+    <!--  添加角色  -->
+    <div class="my-2">
+      <button type="button" class="btn btn-success btn-add">+添加角色</button>
+    </div>
+
+    <!-- 下拉列表，提供可选择的角色信息     -->
+    <div class="row my-2 role-group">
+        <div class="col-3 role my-2 d-flex">
+            <!-- 添加用户角色时，将角色添加到一个角色列表中    -->
+            <select name="roleList[0].roleId" class="form-control select-role">
+                <option th:each="role:${roleList}"
+                        th:value="${role.roleId}"
+                        th:text="${role.roleName}">角色名称</option>
+            </select>
+            <button type="button" class="btn btn-danger btn-del">-</button>
+        </div>
+    </div>
+
+      <button type="submit" class="my-3 btn btn-primary">确认操作</button>
+  </form>
+</div>
+
+
+
+
+
+<script>
+
+
+    //为添加角色按钮添加单击事件
+    $(".btn-add").click(function (){
+        //克隆一份角色列表，方便继续添加用户角色
+        let clone = $(".role").last().clone(true);
+        clone.appendTo(".role-group")
+        resetIndex()
+    })
+
+
+    //为删除按钮添加点击事件
+    $(".btn-del").click(function(){
+        // 只有存在两个及以上角色才能删除
+        if( $(".role").length > 1 ){
+            $(this).parents(".role").remove()
+        }
+        resetIndex()
+    })
+
+    // 给角色列表重新排列索引
+    function resetIndex (){
+        // 循环每一个角色
+        $(".role").each(function(index,item){
+            $(this).find(".select-role").prop("name","roleList["+index+"].roleId")
+        })
+    }
+
+</script>
+
+</body>
+</html>

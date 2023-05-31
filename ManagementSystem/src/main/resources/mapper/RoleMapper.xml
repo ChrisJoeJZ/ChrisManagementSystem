@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chris.mapper.RoleMapper">
+
+    <insert id="batchInsertRolePermission">
+        insert into role_permission
+        (role_id,permission_id)
+        values
+        <foreach collection="idList" item="id" separator=",">
+            (#{role.roleId},#{id})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByRoleIdList">
+        delete from role where role_id in
+        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getRoleListByAdminId" resultType="com.chris.entity.Role">
+        select
+            c.*
+        from
+            admin a
+        join
+            admin_role b
+        on
+            a.admin_id = b.admin_id
+        join
+            role c
+        on
+            b.role_id = c.role_id
+        where
+            a.admin_id = #{adminId}
+    </select>
+
+
+    <select id="listByuUrl" resultType="com.chris.entity.Role">
+        select
+            d.*
+        from
+            operate a
+        join
+            permission_operate b
+        on
+            a.operate_id = b.operate_id
+        join
+            role_permission c
+        on
+            b.permission_id = c.permission_id
+        join
+            role d
+        on
+            c.role_id = d.role_id
+        where
+            a.operate_url = #{url}
+
+    </select>
+
+    <!--  查询角色的sql  -->
+    <select id="listByRoleAndPageBo" resultType="com.chris.entity.Role">
+        select * from role
+        <where>
+            <if test="role.roleId != null">
+                role_id = #{role.roleId}
+            </if>
+            <if test="role.roleName != null and role.roleName.length > 0">
+                and role_name like '%${role.roleName}%'
+            </if>
+        </where>
+        limit
+        #{pageBo.startIndex},#{pageBo.pageSize}
+
+    </select>
+    <!--  符合查询条件的role记录条数  -->
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(*) from role
+        <where>
+            <if test="role.roleId != null">
+                role_id = #{role.roleId}
+            </if>
+            <if test="role.roleName != null and role.roleName.length > 0">
+                and role_name  like '%${role.roleName}%'
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>成功页面</title>
+    <script th:src="@{/js/bootstrap-4.6.1.min.js}"></script>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <link th:href="@{/css/bootstrap-4.6.1.min.css}" rel="stylesheet">
+</head>
+<body>
+<h2>:)</h2>
+<h3 th:text="${param.message}"></h3>
+<!--<a th:href="@{'/'+${controller}}" class="btn btn-primary">返回</a>-->
+<a href="/admin/admin" class="btn btn-primary">返回</a>
+</body>
+</html>
